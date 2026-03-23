@@ -39,6 +39,11 @@ const router = createRouter({
             path: '/refund-policy',
             name: 'refund',
             component: () => import('../views/RefundPolicyView.vue')
+        },
+        {
+            path: '/login',
+            name: 'login',
+            component: () => import('../views/LoginView.vue')
         }
 
         
