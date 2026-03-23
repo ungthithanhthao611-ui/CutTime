@@ -15,21 +15,27 @@ const signatureLooks = [
 ]
 
 onMounted(() => {
+  const observerOptions = {
+    threshold: 0.1,
+    rootMargin: '0px 0px -50px 0px'
+  }
+
   const observer = new IntersectionObserver((entries) => {
     entries.forEach(entry => {
       if (entry.isIntersecting) {
         entry.target.classList.add('active');
-        // Kích hoạt animation cho các con nếu có class stagger-container
+        
+        // Stagger children
         if (entry.target.classList.contains('stagger-container')) {
           entry.target.querySelectorAll('.stagger-item').forEach((el, i) => {
-            setTimeout(() => el.classList.add('active'), i * 150);
+            setTimeout(() => el.classList.add('active'), i * 120);
           });
         }
       }
     })
-  }, { threshold: 0.15 })
+  }, observerOptions)
 
-  document.querySelectorAll('.reveal, .stagger-container').forEach(el => observer.observe(el))
+  document.querySelectorAll('.reveal, .reveal-premium, .reveal-zoom, .stagger-container').forEach(el => observer.observe(el))
 })
 </script>
 
@@ -38,7 +44,7 @@ onMounted(() => {
     <section class="hero-section">
       <div class="hero-grid">
         <div class="hero-content text-center">
-          <div class="reveal">
+          <div class="reveal-premium">
             <h1 class="brand-name-top serif-italic">Erella<br>Hair Studio</h1>
             <h2 class="hero-tagline serif">BESPOKE CRAFTSMANSHIP, UNAPOLOGETIC CONFIDENCE</h2>
             <div class="hero-actions">
@@ -47,7 +53,7 @@ onMounted(() => {
             </div>
           </div>
         </div>
-        <div class="hero-image-side">
+        <div class="hero-image-side reveal-premium">
           <img src="https://images.unsplash.com/photo-1519699047748-de8e457a634e?q=80&w=1200&auto=format&fit=crop" alt="Hero">
         </div>
       </div>
@@ -135,25 +141,28 @@ onMounted(() => {
       </div>
     </section>
 
-  <section class="gallery-section container stagger-container">
-  <h2 class="section-title serif text-center mb-60 stagger-item">Have a Look, Find Your Look</h2>
-  <div class="gallery-4-col">
-    <div v-for="(img, i) in [
-      'https://images.unsplash.com/photo-1582095133179-bfd08e2fc6b3?q=80&w=800&auto=format&fit=crop',
-      'https://images.unsplash.com/photo-1562322140-8baeececf3df?q=80&w=800&auto=format&fit=crop',
-      'https://images.unsplash.com/photo-1582095133179-bfd08e2fc6b3?q=80&w=800&auto=format&fit=crop',
-      'https://images.unsplash.com/photo-1605497788044-5a32c7078486?q=80&w=800&auto=format&fit=crop'
-    ]" :key="i" class="gallery-item-wrapper stagger-item">
-      <img :src="img" alt="Gallery" class="gallery-img">
+  <section class="gallery-section container reveal-premium stagger-container">
+    <h2 class="section-title serif text-center mb-60 stagger-item">Have a Look, Find Your Look</h2>
+    <div class="gallery-4-col">
+      <div v-for="(img, i) in [
+        'https://images.unsplash.com/photo-1582095133179-bfd08e2fc6b3?q=80&w=800&auto=format&fit=crop',
+        'https://images.unsplash.com/photo-1562322140-8baeececf3df?q=80&w=800&auto=format&fit=crop',
+        'https://images.unsplash.com/photo-1582095133179-bfd08e2fc6b3?q=80&w=800&auto=format&fit=crop',
+        'https://images.unsplash.com/photo-1605497788044-5a32c7078486?q=80&w=800&auto=format&fit=crop'
+      ]" :key="i" class="gallery-item-wrapper stagger-item reveal-zoom">
+        <img :src="img" alt="Gallery" class="gallery-img">
+      </div>
     </div>
-  </div>
-</section>
+  </section>
 
     <Transition name="fade">
       <div v-if="isModalOpen" class="modal-overlay" @click.self="toggleModal">
         <div class="modal-content">
-          <p class="modal-text">Sorry, this service is not yet available for online bookings.</p>
-          <button class="btn-black mt-20" @click="toggleModal">Got it</button>
+          <button class="modal-close-icon" @click="toggleModal">&times;</button>
+          <div class="modal-body-content">
+            <p class="modal-text">Sorry, this service is not yet available for online bookings.</p>
+            <button class="btn-black-sm mt-30" @click="toggleModal">Got it</button>
+          </div>
         </div>
       </div>
     </Transition>
@@ -256,28 +265,104 @@ onMounted(() => {
 .btn-black-sm { background: #000; color: #fff; border: none; padding: 14px 35px; cursor: pointer; text-transform: uppercase; font-size: 11px; font-weight: 600; }
 
 /* REVEAL & STAGGER ANIMATIONS */
-.reveal, .stagger-item { 
+.reveal { 
   opacity: 0; 
-  transform: translateY(40px); 
-  transition: all 0.9s cubic-bezier(0.25, 0.46, 0.45, 0.94); 
+  transform: translateY(30px); 
+  transition: all 1s cubic-bezier(0.2, 0.8, 0.2, 1); 
 }
-.reveal.active, .stagger-item.active { 
+.reveal.active { 
   opacity: 1; 
   transform: translateY(0); 
 }
 
+.stagger-item {
+  opacity: 0;
+  transform: translateY(40px);
+  transition: all 1.2s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+.stagger-item.active {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* PREMIUM REVEAL */
+.reveal-premium {
+  opacity: 0;
+  transform: translateY(80px) scale(0.95);
+  filter: blur(5px);
+  transition: all 1.4s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+.reveal-premium.active {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+  filter: blur(0);
+}
+
+.reveal-zoom {
+  overflow: hidden;
+}
+.reveal-zoom img {
+  transform: scale(1.3);
+  transition: transform 1.8s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+.reveal-zoom.active img {
+  transform: scale(1);
+}
+
 /* MODAL */
 .modal-overlay { position: fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.7); display:flex; align-items:center; justify-content:center; z-index:9999; backdrop-filter: blur(8px); }
-.modal-content { background:#fff; padding:60px; text-align:center; max-width: 500px; width: 90%; position: relative; }
-.modal-text { font-size: 18px; line-height: 1.6; color: #333; }
+.modal-content { 
+  background:#fff; 
+  padding:60px 40px; 
+  text-align:center; 
+  max-width: 500px; 
+  width: 92%; 
+  position: relative; 
+  box-shadow: 0 30px 60px rgba(0,0,0,0.2);
+}
+.modal-close-icon {
+  position: absolute;
+  top: 15px;
+  right: 20px;
+  font-size: 32px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #000;
+  transition: opacity 0.2s;
+}
+.modal-close-icon:hover { opacity: 0.6; }
+.modal-text { font-size: 18px; line-height: 1.6; color: #333; margin-top: 20px; }
+.mt-30 { margin-top: 30px; }
 
 @media (max-width: 1024px) {
   .hero-grid { grid-template-columns: 1fr; }
-  .hero-image-side { height: 50vh; order: -1; }
-  .looks-grid { grid-template-columns: repeat(2, 1fr); }
+  .hero-image-side { 
+    height: 60vh; 
+    order: -1; 
+    overflow: hidden;
+  }
+  .hero-image-side img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center 20%;
+  }
+  .brand-name-top { font-size: 60px; margin-bottom: 25px; }
+  .hero-tagline { font-size: 16px; margin-bottom: 30px; padding: 0 20px; }
+  .hero-content { padding: 40px 20px; }
+  .hero-actions { flex-direction: column; width: 100%; padding: 0 40px; }
+  .btn-black, .btn-outline { width: 100%; padding: 15px; }
+
+  .looks-grid { grid-template-columns: repeat(2, 1fr); gap: 20px; }
   .testi-column { max-width: 100%; }
   .mini-item { grid-template-columns: 1fr auto; }
   .mini-desc { grid-column: span 2; padding-top: 15px; }
   .gallery-4-col { grid-template-columns: repeat(2, 1fr); }
+  .big-quote { font-size: 24px; }
+  
+  .looks-header-box { flex-direction: column; gap: 20px; margin-bottom: 40px; }
+  .section-subtitle { max-width: 100%; }
+  .brand-name-top { font-size: 55px; }
 }
 </style>

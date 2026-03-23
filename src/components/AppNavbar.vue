@@ -76,7 +76,12 @@ const handleUserClick = () => {
     <!-- Fullscreen Overlay Menu - Now Right Drawer -->
     <Transition name="slide">
       <div v-if="isMenuOpen" class="menu-overlay">
-        <button @click="toggleMenu" class="close-overlay">&times;</button>
+        <button @click="toggleMenu" class="close-overlay" aria-label="Close menu">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
         
         <div class="overlay-top">
           <router-link v-if="!auth.isAuthenticated" to="/login" @click="toggleMenu" class="overlay-auth-btn">
@@ -132,12 +137,16 @@ const handleUserClick = () => {
 /* Logo Box Style */
 .logo-box {
   background: white;
-  padding: 10px 40px;
+  padding: 12px 40px;
   border-radius: 4px;
   display: flex;
   align-items: center;
   gap: 30px;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+  box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+  white-space: nowrap;
+  position: relative;
+  z-index: 10002;
+  transition: transform 0.3s ease;
 }
 
 .brand-logo {
@@ -251,11 +260,11 @@ const handleUserClick = () => {
 .menu-overlay {
   position: fixed;
   top: 0;
-  right: 0; /* Align to right to cover the girl's face */
-  width: 50%; /* Cover right half */
+  right: 0;
+  width: 50%; /* Cover right half only on desktop as requested */
   height: 100vh;
   background-color: #fce4ec;
-  z-index: 2000;
+  z-index: 10000;
   display: flex;
   flex-direction: column;
   padding: 40px 0;
@@ -264,7 +273,7 @@ const handleUserClick = () => {
 
 /* Slide Transition */
 .slide-enter-active, .slide-leave-active {
-  transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
 }
 .slide-enter-from, .slide-leave-to {
   transform: translateX(100%);
@@ -272,7 +281,7 @@ const handleUserClick = () => {
 
 @media (max-width: 768px) {
   .menu-overlay {
-    width: 100%; /* Full screen on mobile */
+    width: 100%; /* Full screen ONLY on mobile */
   }
 }
 
@@ -323,12 +332,26 @@ const handleUserClick = () => {
 .close-overlay {
   position: absolute;
   top: 30px;
-  right: 40px;
-  font-size: 40px;
-  background: none;
-  border: none;
+  right: 30px;
+  color: #000;
+  background: white;
+  border: 1px solid #000;
+  border-radius: 50%;
   cursor: pointer;
-  z-index: 2002;
+  z-index: 10001; /* Highest priority */
+  width: 60px;
+  height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+  transition: all 0.3s ease;
+}
+
+.close-overlay:hover {
+  transform: scale(1.1) rotate(90deg);
+  background: #000;
+  color: #fff;
 }
 
 .overlay-content {

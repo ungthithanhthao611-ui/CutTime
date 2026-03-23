@@ -1,10 +1,27 @@
 <script setup>
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
 
 const isModalOpen = ref(false)
 const toggleModal = () => {
   isModalOpen.value = !isModalOpen.value
 }
+
+onMounted(() => {
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('active');
+        if (entry.target.classList.contains('stagger-container')) {
+          entry.target.querySelectorAll('.stagger-item').forEach((el, i) => {
+            setTimeout(() => el.classList.add('active'), i * 150);
+          });
+        }
+      }
+    })
+  }, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' })
+
+  document.querySelectorAll('.reveal-premium, .stagger-container').forEach(el => observer.observe(el))
+})
 
 const serviceCategories = [
   {
@@ -46,10 +63,10 @@ const serviceCategories = [
 <template>
   <div class="services-page">
     <div class="container main-content">
-      <h1 class="page-title serif">OUR SERVICES</h1>
+      <h1 class="page-title serif reveal-premium">OUR SERVICES</h1>
 
-      <div class="services-container">
-        <div v-for="category in serviceCategories" :key="category.name" class="category-block">
+      <div class="services-container stagger-container">
+        <div v-for="category in serviceCategories" :key="category.name" class="category-block stagger-item">
           <h2 class="category-title">{{ category.name }}</h2>
           
           <div class="services-list">
@@ -79,6 +96,17 @@ const serviceCategories = [
 </template>
 
 <style scoped>
+/* REVEAL & STAGGER ANIMATIONS */
+.reveal-premium, .stagger-item { 
+  opacity: 0; 
+  transform: translateY(40px) scale(0.98); 
+  transition: all 1s cubic-bezier(0.2, 0.8, 0.2, 1); 
+}
+.reveal-premium.active, .stagger-item.active { 
+  opacity: 1; 
+  transform: translateY(0) scale(1); 
+}
+
 /* Màu nền hồng phấn đặc trưng */
 .services-page {
   background-color: #FEE7E7; /* Giữ tông hồng nhạt sang trọng */
@@ -210,4 +238,4 @@ const serviceCategories = [
     width: 100%;
   }
 }
-</style>@
+</style>
